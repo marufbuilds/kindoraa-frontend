@@ -104,7 +104,7 @@ export default function HowItWorks() {
           viewport={{ once: true, amount: 0.15 }}
           className="relative mt-12 grid gap-5 md:grid-cols-3 lg:mt-14"
         >
-          {/* Connecting line on desktop */}
+           
           <div className="pointer-events-none absolute left-[16%] right-[16%] top-10 hidden border-t border-dashed border-[#b7cdbb] md:block dark:border-[#365b41]" />
 
           {steps.map((step) => {

@@ -3,11 +3,7 @@ import Link from "next/link";
 import { Sparkle } from "lucide-react";
 
 /**
- * Hero section — "Make a difference, one community at a time."
- *
- * Two-column on desktop (copy left, photo card right), stacked on tablet/mobile.
- * Colors come from Kindora's theme tokens where possible so it adapts to dark
- * mode automatically; sage tints use light/dark pairs inline.
+ * 
  */
 export default function Hero() {
   return (
