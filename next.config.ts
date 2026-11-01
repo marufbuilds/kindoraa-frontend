@@ -5,6 +5,20 @@ const nextConfig: NextConfig = {
   experimental: {
     agentFeedback: true,
   },
+   images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+      {
+      protocol: "https",
+      hostname: "res.cloudinary.com",
+      pathname: "/**",
+    },
+    ],
+  },
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
@@ -16,5 +30,6 @@ const nextConfig: NextConfig = {
     },
   },
 };
+
 
 export default nextConfig;
