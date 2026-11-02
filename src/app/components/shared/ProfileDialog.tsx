@@ -1,6 +1,7 @@
  
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -34,13 +35,20 @@ export default function ProfileDialog({
   onClose,
 }: ProfileDialogProps) {
   const router = useRouter();
-  const { data: session } = authClient.useSession();
+
+  const { data: session, isPending } = authClient.useSession();
+
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const user = session?.user;
-  const initial = user?.name?.charAt(0)?.toUpperCase() || "U";
+
+  const initial =
+    user?.name?.trim()?.charAt(0)?.toUpperCase() || "U";
 
   const handleLogout = async () => {
     try {
+      setIsLoggingOut(true);
+
       const { error } = await authClient.signOut();
 
       if (error) {
@@ -50,11 +58,14 @@ export default function ProfileDialog({
 
       onClose();
       toast.success("Logged out successfully.");
-      router.push("/");
+
+      router.replace("/");
       router.refresh();
     } catch (error) {
       console.error("Logout error:", error);
-      toast.error("Something went wrong.");
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -80,127 +91,185 @@ export default function ProfileDialog({
   return (
     <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
       <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-3xl border border-[#e8eee8] bg-[#fffefa] p-6 dark:border-white/10 dark:bg-[#18251c] sm:p-8">
+
         {/* Profile Header */}
         <DialogHeader className="items-center border-b border-[#e8eee8] pb-6 text-center dark:border-white/10">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#e5f1e5] text-3xl font-bold text-[#166534] dark:bg-[#263b2c] dark:text-[#a8d5b1]">
-            {initial}
-          </div>
+          {isPending ? (
+            <>
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#e5f1e5] dark:bg-[#263b2c]">
+                <UserRound size={30} className="text-[#166534] dark:text-[#a8d5b1]" />
+              </div>
 
-          <DialogTitle className="mt-3 text-xl font-bold text-[#174b2b] dark:text-white">
-            {user?.name || "Kindora Member"}
-          </DialogTitle>
+              <DialogTitle className="mt-3 text-xl font-bold text-[#174b2b] dark:text-white">
+                Loading profile...
+              </DialogTitle>
 
-          <DialogDescription className="flex items-center justify-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
-            <Mail size={15} />
-            {user?.email || "No email available"}
-          </DialogDescription>
+              <DialogDescription>
+                Please wait while we check your account.
+              </DialogDescription>
+            </>
+          ) : user ? (
+            <>
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#e5f1e5] text-3xl font-bold text-[#166534] dark:bg-[#263b2c] dark:text-[#a8d5b1]">
+                {initial}
+              </div>
 
-          <span className="mt-2 rounded-full bg-[#eaf5eb] px-3 py-1 text-xs font-semibold text-[#166534] dark:bg-[#263b2c] dark:text-[#a8d5b1]">
-            Kindora Member
-          </span>
+              <DialogTitle className="mt-3 text-xl font-bold text-[#174b2b] dark:text-white">
+                {user.name || "Kindora Member"}
+              </DialogTitle>
+
+              <DialogDescription className="flex items-center justify-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
+                <Mail size={15} />
+                {user.email || "No email available"}
+              </DialogDescription>
+
+              <span className="mt-2 rounded-full bg-[#eaf5eb] px-3 py-1 text-xs font-semibold text-[#166534] dark:bg-[#263b2c] dark:text-[#a8d5b1]">
+                Kindora Member
+              </span>
+            </>
+          ) : (
+            <>
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#e5f1e5] dark:bg-[#263b2c]">
+                <UserRound size={30} className="text-[#166534] dark:text-[#a8d5b1]" />
+              </div>
+
+              <DialogTitle className="mt-3 text-xl font-bold text-[#174b2b] dark:text-white">
+                Youre not signed in
+              </DialogTitle>
+
+              <DialogDescription>
+                Sign in to access your Kindora profile.
+              </DialogDescription>
+
+              <Link
+                href="/login"
+                onClick={onClose}
+                className="mt-3 rounded-xl bg-[#174b2b] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#216238]"
+              >
+                Sign In
+              </Link>
+            </>
+          )}
         </DialogHeader>
 
         {/* Account Information */}
-        <div className="mt-5 space-y-3">
-          <div className="flex items-center gap-3 rounded-xl bg-[#f5f7f2] p-3.5 dark:bg-[#223328]">
-            <UserRound className="text-[#166534] dark:text-[#a8d5b1]" size={19} />
-            <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Full Name
-              </p>
-              <p className="text-sm font-semibold text-[#174b2b] dark:text-white">
-                {user?.name || "Not provided"}
-              </p>
+        {user && !isPending && (
+          <>
+            <div className="mt-5 space-y-3">
+              <div className="flex items-center gap-3 rounded-xl bg-[#f5f7f2] p-3.5 dark:bg-[#223328]">
+                <UserRound
+                  className="text-[#166534] dark:text-[#a8d5b1]"
+                  size={19}
+                />
+
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Full Name
+                  </p>
+
+                  <p className="text-sm font-semibold text-[#174b2b] dark:text-white">
+                    {user.name || "Not provided"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 rounded-xl bg-[#f5f7f2] p-3.5 dark:bg-[#223328]">
+                <Mail
+                  className="text-[#166534] dark:text-[#a8d5b1]"
+                  size={19}
+                />
+
+                <div className="min-w-0">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Email Address
+                  </p>
+
+                  <p className="break-all text-sm font-semibold text-[#174b2b] dark:text-white">
+                    {user.email || "Not available"}
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-center gap-3 rounded-xl bg-[#f5f7f2] p-3.5 dark:bg-[#223328]">
-            <Mail className="text-[#166534] dark:text-[#a8d5b1]" size={19} />
-            <div className="min-w-0">
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Email Address
-              </p>
-              <p className="break-all text-sm font-semibold text-[#174b2b] dark:text-white">
-                {user?.email || "Not available"}
-              </p>
-            </div>
-          </div>
-        </div>
+            {/* Activities */}
+            <div className="mt-6">
+              <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                My Activities
+              </h3>
 
-        {/* Activities */}
-        <div className="mt-6">
-          <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-            My Activities
-          </h3>
+              <div className="space-y-2">
+                {actions.map((action) => {
+                  const Icon = action.icon;
 
-          <div className="space-y-2">
-            {actions.map((action) => {
-              const Icon = action.icon;
+                  return (
+                    <Link
+                      key={action.title}
+                      href={action.href}
+                      onClick={onClose}
+                      className="group flex items-center gap-3 rounded-xl border border-[#e8eee8] p-3.5 transition hover:border-[#b9d0b9] hover:bg-[#f5f8f3] dark:border-white/10 dark:hover:bg-[#223328]"
+                    >
+                      <div className={`rounded-xl p-2.5 ${action.color}`}>
+                        <Icon size={20} />
+                      </div>
 
-              return (
-                <Link
-                  key={action.title}
-                  href={action.href}
-                  onClick={onClose}
-                  className="group flex items-center gap-3 rounded-xl border border-[#e8eee8] p-3.5 transition hover:border-[#b9d0b9] hover:bg-[#f5f8f3] dark:border-white/10 dark:hover:bg-[#223328]"
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-[#174b2b] dark:text-white">
+                          {action.title}
+                        </p>
+
+                        <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                          {action.description}
+                        </p>
+                      </div>
+
+                      <ChevronRight
+                        size={18}
+                        className="text-gray-400 transition group-hover:translate-x-1"
+                      />
+                    </Link>
+                  );
+                })}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    toast.info("Joined Events will be available soon!")
+                  }
+                  className="flex w-full items-center gap-3 rounded-xl border border-[#e8eee8] p-3.5 text-left transition hover:bg-[#f5f8f3] dark:border-white/10 dark:hover:bg-[#223328]"
                 >
-                  <div className={`rounded-xl p-2.5 ${action.color}`}>
-                    <Icon size={20} />
+                  <div className="rounded-xl bg-blue-100 p-2.5 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                    <Users size={20} />
                   </div>
 
                   <div className="flex-1">
                     <p className="text-sm font-bold text-[#174b2b] dark:text-white">
-                      {action.title}
+                      Joined Events
                     </p>
+
                     <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                      {action.description}
+                      See the events you have joined
                     </p>
                   </div>
 
-                  <ChevronRight
-                    size={18}
-                    className="text-gray-400 transition group-hover:translate-x-1"
-                  />
-                </Link>
-              );
-            })}
+                  <span className="rounded-full bg-orange-100 px-2 py-1 text-[10px] font-bold text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+                    Soon
+                  </span>
+                </button>
+              </div>
+            </div>
 
+            {/* Logout */}
             <button
               type="button"
-              onClick={() =>
-                toast.info("Joined Events will be available soon!")
-              }
-              className="flex w-full items-center gap-3 rounded-xl border border-[#e8eee8] p-3.5 text-left transition hover:bg-[#f5f8f3] dark:border-white/10 dark:hover:bg-[#223328]"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 px-4 py-3.5 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-900/40 dark:hover:bg-red-950/30"
             >
-              <div className="rounded-xl bg-blue-100 p-2.5 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                <Users size={20} />
-              </div>
-
-              <div className="flex-1">
-                <p className="text-sm font-bold text-[#174b2b] dark:text-white">
-                  Joined Events
-                </p>
-                <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                  See the events you have joined
-                </p>
-              </div>
-
-              <span className="rounded-full bg-orange-100 px-2 py-1 text-[10px] font-bold text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
-                Soon
-              </span>
+              <LogOut size={17} />
+              {isLoggingOut ? "Logging out..." : "Log Out"}
             </button>
-          </div>
-        </div>
-
-        {/* Logout */}
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 px-4 py-3.5 text-sm font-semibold text-red-600 transition hover:bg-red-50 dark:border-red-900/40 dark:hover:bg-red-950/30"
-        >
-          <LogOut size={17} />
-          Log Out
-        </button>
+          </>
+        )}
 
         <div className="flex items-center justify-center gap-2 pt-3 text-xs text-gray-400">
           <HeartHandshake size={15} />

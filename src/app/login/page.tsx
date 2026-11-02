@@ -47,34 +47,36 @@ export default function LoginPage() {
       }
 
       toast.success("Welcome back to Kindora!");
-      router.push("/");
+      router.replace("/");
       router.refresh();
-    } catch {
+    } catch (error) {
+      console.error("Email login error:", error);
       toast.error("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-      setIsGoogleLoading(true);
+const handleGoogleLogin = async () => {
+  try {
+    setIsGoogleLoading(true);
 
-      const { error } = await authClient.signIn.social({
-        provider: "google",
-        callbackURL: `${FRONTEND_URL}/`,
-        errorCallbackURL: `${FRONTEND_URL}/login`,
-      });
+    const { error } = await authClient.signIn.social({
+      provider: "google",
+      callbackURL: `${FRONTEND_URL}/profile=1`,
+      errorCallbackURL: `${FRONTEND_URL}/login`,
+    });
 
-      if (error) {
-        toast.error(error.message || "Google login failed.");
-        setIsGoogleLoading(false);
-      }
-    } catch {
-      toast.error("Unable to sign in with Google.");
+    if (error) {
+      toast.error(error.message || "Google login failed.");
       setIsGoogleLoading(false);
     }
-  };
+  } catch (error) {
+    console.error("Google login error:", error);
+    toast.error("Unable to sign in with Google.");
+    setIsGoogleLoading(false);
+  }
+};
 
   return (
     <main className="mt-20 mb-20 min-h-screen bg-[#F8F7F2] text-[#173B26] dark:bg-[#101B14] dark:text-white">
@@ -141,6 +143,7 @@ export default function LoginPage() {
               </p>
             </div>
 
+            {/* Email Login */}
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Email */}
               <div>
@@ -159,6 +162,7 @@ export default function LoginPage() {
 
                   <input
                     id="email"
+                    name="email"
                     type="email"
                     autoComplete="email"
                     placeholder="you@example.com"
@@ -169,8 +173,7 @@ export default function LoginPage() {
                   />
                 </div>
               </div>
-
-              {/* Password */}
+  
               <div>
                 <label
                   htmlFor="password"
@@ -187,6 +190,7 @@ export default function LoginPage() {
 
                   <input
                     id="password"
+                    name="password"
                     type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
                     placeholder="Enter your password"
@@ -227,7 +231,7 @@ export default function LoginPage() {
               <div className="h-px flex-1 bg-[#E3E7DF] dark:bg-white/10" />
             </div>
 
-            {/* Google */}
+            {/* Google Login */}
             <button
               type="button"
               onClick={handleGoogleLogin}

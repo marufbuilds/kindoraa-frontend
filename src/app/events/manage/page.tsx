@@ -12,16 +12,20 @@ export default function ManageEventsPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const { data: session, isPending } = authClient.useSession();
+
   useEffect(() => {
+    if (isPending) return;
+
+    let cancelled = false;
+
     const getMyEvents = async () => {
       try {
         setLoading(true);
         setErrorMessage("");
 
-        // Get JWT token
-        const { data, error } = await authClient.token();
-
-        if (error || !data?.token) {
+        // Check login session
+        if (!session?.user) {
           throw new Error("Please log in to view your events.");
         }
 
@@ -31,7 +35,15 @@ export default function ManageEventsPage() {
           throw new Error("API URL is not configured.");
         }
 
-        // Fetch only the logged-in user's events
+        // Get JWT token
+        const { data, error } = await authClient.token();
+
+        if (error || !data?.token) {
+          console.error("JWT token error:", error);
+          throw new Error("Unable to get your authentication token.");
+        }
+
+        // Fetch user's events
         const response = await fetch(
           `${apiUrl.replace(/\/$/, "")}/events/my-events`,
           {
@@ -43,11 +55,7 @@ export default function ManageEventsPage() {
           }
         );
 
-        // Read backend response
         const result = await response.json();
-
-        console.log("My events status:", response.status);
-        console.log("My events response:", result);
 
         if (!response.ok) {
           throw new Error(
@@ -55,7 +63,9 @@ export default function ManageEventsPage() {
           );
         }
 
-        setEvents(result);
+        if (!cancelled) {
+          setEvents(Array.isArray(result) ? result : []);
+        }
       } catch (error) {
         console.error("Error fetching your events:", error);
 
@@ -64,17 +74,25 @@ export default function ManageEventsPage() {
             ? error.message
             : "Unable to load your events.";
 
-        setErrorMessage(message);
-        toast.error(message);
+        if (!cancelled) {
+          setErrorMessage(message);
+          toast.error(message);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     getMyEvents();
-  }, []);
 
-  if (loading) {
+    return () => {
+      cancelled = true;
+    };
+  }, [session, isPending]);
+
+  if (loading || isPending) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#F8F7F2] dark:bg-[#101B14]">
         <p className="text-lg font-medium text-[#166534] dark:text-green-400">

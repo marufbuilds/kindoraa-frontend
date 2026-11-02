@@ -70,24 +70,25 @@ export default function RegisterPage() {
   };
 
   const handleGoogleSignUp = async () => {
-    try {
-      setIsGoogleLoading(true);
+  try {
+    setIsGoogleLoading(true);
 
-      const { error } = await authClient.signIn.social({
-        provider: "google",
-        callbackURL: `${FRONTEND_URL}/`,
-        errorCallbackURL: `${FRONTEND_URL}/login`,
-      });
+    const { error } = await authClient.signIn.social({
+      provider: "google",
+      callbackURL: `${FRONTEND_URL}/`,
+      errorCallbackURL: `${FRONTEND_URL}/register`,
+    });
 
-      if (error) {
-        toast.error(error.message || "Google sign-up failed.");
-        setIsGoogleLoading(false);
-      }
-    } catch {
-      toast.error("Unable to continue with Google.");
-      setIsGoogleLoading(false);
+    if (error) {
+      toast.error(error.message || "Google sign-up failed.");
     }
-  };
+  } catch (error) {
+    console.error("Google registration error:", error);
+    toast.error("Unable to continue with Google.");
+  } finally {
+    setIsGoogleLoading(false);
+  }
+};
 
   return (
     <main className="mt-20 mb-20 min-h-screen bg-[#F8F7F2] dark:bg-[#101B14]">
