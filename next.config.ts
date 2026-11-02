@@ -1,11 +1,24 @@
+ 
 import type { NextConfig } from "next";
 
+const backendUrl =
+  process.env.BACKEND_URL || "http://localhost:5000";
+
 const nextConfig: NextConfig = {
-  /* config options here */
   experimental: {
     agentFeedback: true,
   },
-   images: {
+
+  async rewrites() {
+    return [
+      {
+        source: "/api/backend/:path*",
+        destination: `${backendUrl}/:path*`,
+      },
+    ];
+  },
+
+  images: {
     remotePatterns: [
       {
         protocol: "https",
@@ -13,14 +26,16 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
       {
-      protocol: "https",
-      hostname: "res.cloudinary.com",
-      pathname: "/**",
-    },
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/**",
+      },
     ],
   },
+
   cacheComponents: true,
   partialPrefetching: true,
+
   turbopack: {
     rules: {
       "*.css": {
@@ -30,6 +45,5 @@ const nextConfig: NextConfig = {
     },
   },
 };
-
 
 export default nextConfig;
