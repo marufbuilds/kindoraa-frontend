@@ -63,7 +63,7 @@ const handleGoogleLogin = async () => {
 
     const { error } = await authClient.signIn.social({
       provider: "google",
-      callbackURL: `${FRONTEND_URL}/profile`,
+      callbackURL: `${FRONTEND_URL}/`,
       errorCallbackURL: `${FRONTEND_URL}/login`,
     });
 
