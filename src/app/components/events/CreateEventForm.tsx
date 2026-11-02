@@ -69,8 +69,7 @@ export default function CreateEventForm({
     try {
       setIsSubmitting(true);
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
       if (!apiUrl) {
         throw new Error("API URL is not configured.");
       }

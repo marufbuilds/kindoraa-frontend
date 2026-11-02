@@ -66,12 +66,13 @@ export default function ManageEventsClient({
       }
 
       // Send DELETE request with JWT
-      const response = await fetch(`${apiUrl}/events/${event._id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${data.token}`,
-        },
-      });
+     const response = await fetch(`${apiUrl.replace(/\/$/, "")}/events/${event._id}`, {
+  method: "DELETE",
+  credentials: "include",
+  headers: {
+    Authorization: `Bearer ${data.token}`,
+  },
+});
 
       const result = await response.json();
 
