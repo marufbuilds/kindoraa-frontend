@@ -1,4 +1,4 @@
-export interface Event {
+ export interface Event {
   _id: string;
   title: string;
   category: string;
@@ -9,4 +9,14 @@ export interface Event {
   imageUrl: string;
   description: string;
   organizerEmail: string;
+
+  joinedCount?: number;
+  remainingSpots?: number;
+
+  volunteers?: {
+    _id: string;
+    name: string;
+    image?: string;
+    joinedAt?: string;
+  }[];
 }

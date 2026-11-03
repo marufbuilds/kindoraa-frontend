@@ -97,7 +97,10 @@ export default function ProfileDialog({
           {isPending ? (
             <>
               <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#e5f1e5] dark:bg-[#263b2c]">
-                <UserRound size={30} className="text-[#166534] dark:text-[#a8d5b1]" />
+                <UserRound
+                  size={30}
+                  className="text-[#166534] dark:text-[#a8d5b1]"
+                />
               </div>
 
               <DialogTitle className="mt-3 text-xl font-bold text-[#174b2b] dark:text-white">
@@ -130,7 +133,10 @@ export default function ProfileDialog({
           ) : (
             <>
               <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#e5f1e5] dark:bg-[#263b2c]">
-                <UserRound size={30} className="text-[#166534] dark:text-[#a8d5b1]" />
+                <UserRound
+                  size={30}
+                  className="text-[#166534] dark:text-[#a8d5b1]"
+                />
               </div>
 
               <DialogTitle className="mt-3 text-xl font-bold text-[#174b2b] dark:text-white">
@@ -230,12 +236,11 @@ export default function ProfileDialog({
                   );
                 })}
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    toast.info("Joined Events will be available soon!")
-                  }
-                  className="flex w-full items-center gap-3 rounded-xl border border-[#e8eee8] p-3.5 text-left transition hover:bg-[#f5f8f3] dark:border-white/10 dark:hover:bg-[#223328]"
+                {/* Joined Events */}
+                <Link
+                  href="/events/joined"
+                  onClick={onClose}
+                  className="group flex w-full items-center gap-3 rounded-xl border border-[#e8eee8] p-3.5 text-left transition hover:border-[#b9d0b9] hover:bg-[#f5f8f3] dark:border-white/10 dark:hover:bg-[#223328]"
                 >
                   <div className="rounded-xl bg-blue-100 p-2.5 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
                     <Users size={20} />
@@ -251,10 +256,11 @@ export default function ProfileDialog({
                     </p>
                   </div>
 
-                  <span className="rounded-full bg-orange-100 px-2 py-1 text-[10px] font-bold text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
-                    Soon
-                  </span>
-                </button>
+                  <ChevronRight
+                    size={18}
+                    className="text-gray-400 transition group-hover:translate-x-1"
+                  />
+                </Link>
               </div>
             </div>
 
