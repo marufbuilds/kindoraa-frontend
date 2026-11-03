@@ -23,7 +23,7 @@ export default function JoinEventPage() {
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+ const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "");
 
   // Get event details
   useEffect(() => {
