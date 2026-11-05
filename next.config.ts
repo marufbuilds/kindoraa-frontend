@@ -11,6 +11,13 @@ const nextConfig: NextConfig = {
 
   async rewrites() {
     return [
+      // Better Auth proxy
+      {
+        source: "/api/auth/:path*",
+        destination: `${backendUrl}/api/auth/:path*`,
+      },
+
+      // Other backend API requests
       {
         source: "/api/backend/:path*",
         destination: `${backendUrl}/:path*`,
