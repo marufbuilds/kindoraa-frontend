@@ -8,6 +8,8 @@ import Testimonial from "@/components/testimonial";
 import CtaBanner from "@/components/cta-banner";
 import Stats from "@/components/stats";
 import EventList from "./components/events/EventList";
+import PreviousEventsGallery from "@/components/PreviousEventsGallery";
+import SubscribeToLocalCauseAlert from "@/components/SubscribeToLocalCauseAlert";
 
 export default function HomePage() {
   return (
@@ -31,10 +33,12 @@ export default function HomePage() {
           </Suspense>
         </div>
       </section>
-
       <HowItWorks />
+ <PreviousEventsGallery />
       <Causes />
+       
       <Testimonial />
+      <SubscribeToLocalCauseAlert />
       <CtaBanner />
     </div>
   );

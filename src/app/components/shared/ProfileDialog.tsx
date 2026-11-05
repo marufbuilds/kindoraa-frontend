@@ -140,7 +140,7 @@ export default function ProfileDialog({
               </div>
 
               <DialogTitle className="mt-3 text-xl font-bold text-[#174b2b] dark:text-white">
-                Youre not signed in
+                Yousre not signed in
               </DialogTitle>
 
               <DialogDescription>

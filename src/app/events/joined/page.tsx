@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
-import Image from "next/image";
 
 type Event = {
   _id: string;
@@ -34,7 +33,8 @@ export default function JoinedEventsPage() {
   const [error, setError] = useState("");
   const [cancellingId, setCancellingId] = useState<string | null>(null);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  // Remove trailing slashes from API URL
+  const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "");
 
   // Fetch joined events
   useEffect(() => {
@@ -54,6 +54,7 @@ export default function JoinedEventsPage() {
         }
 
         const response = await fetch(`${API_URL}/events/joined`, {
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -128,7 +129,6 @@ export default function JoinedEventsPage() {
         );
       }
 
-      // Remove the cancelled event from the page
       setEvents((previousEvents) =>
         previousEvents.filter((event) => event._id !== eventId)
       );
@@ -177,7 +177,6 @@ export default function JoinedEventsPage() {
   return (
     <main className="min-h-screen bg-[#f7f9f5] px-4 py-16 dark:bg-[#101a13]">
       <div className="mx-auto max-w-6xl">
-
         {/* Header */}
         <div className="mb-10">
           <Link
